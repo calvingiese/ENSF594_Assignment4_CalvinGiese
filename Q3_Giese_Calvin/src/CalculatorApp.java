@@ -1,11 +1,10 @@
 /**
  * Class Name: ConverterApp
  * 
- * Constructs a new StackApp that CLI that tests whether a user enters a valid bracket or not.
+ * Constructs a new CalculatorApp CLI that uses determines the correct output for mathematical expressions in postfix format.
  * 
- * The main purpose of this class is to build a stack from the user's entry and test whether or not it matches the brackets
- * defined in the program (). There can be nested brackets but it must be a series of opening brackets followed by the same
- * number of closing brackets to be valid.
+ * The main purpose of this class is to build a stack from the user's entry and perform the calculations using postfix logic
+ * and then print the results for the user to see.
  * 
  * @author Calvin Giese
  * @version version 1.0
@@ -36,20 +35,19 @@ public class CalculatorApp {
 		// Beginning of user interface
 		reader.display('\n' + "        Postfix Calculator Program        " + '\n');
 		
-		// Builds stack of alternating characters and operators, continuing to run until the user opts to exit
 		int exit = 0; // Integer used to switch on when the while loop should exit
-
 		
+		// Continues to run program until the user opts to exit
 		while(exit == 0) {
 			
-			// Prompts user to enter their mathematical expression to be converted
+			// Prompts user to enter their mathematical expression to be converted (postfix format)
 			reader.prompt('\n' + "Please enter an postfix mathematical expression to calculate or type 'EXIT' to end program: ");
 			String entry = reader.getKeyboardInput();
 			
-			StringBuffer b1 = new StringBuffer();
+			// Declares variables and indicators to be used later
 			String valid = "invalid";
-			int opCounter = 0;
 			String output = null;
+			int opCounter = 0;
 			
 			// Leaves if user types 'EXIT'
 			if(entry.equals("EXIT")) {
@@ -57,62 +55,72 @@ public class CalculatorApp {
 				break;
 			}
 			
-			// 
+			// Applies algorithm to entries with at least 3 characters
 			else if(entry.length() > 2){
 				
-				Stack calcStack = new Stack(entry.length());
-				for(int i = entry.length() - 1; i > - 1; i--) {
-					calcStack.push(entry.charAt(i));
-				}
-				
-				for(int i = entry.length() - 1; i > - 1; i--) {
-					if(opValue(entry.charAt(i)) > 0) {
+				// Builds stack with and adds the user's entry to it, one by one starting from the last character
+				int length = entry.length();
+				Stack calcStack = new Stack(length);
+				for(int i = length - 1; i > - 1; i--) {
+					String character = entry.charAt(i) + "";
+					calcStack.push(character);
+					if(opValue(character) > 0) {
 						opCounter++;
 					}
 				}
 				
-				if(entry.length() / 2 == opCounter) {
+				// Valid expression if the operator count fits the entry length
+				if(length / 2 == opCounter) {
 					valid = "valid";
 				}
 				
-				Stack newStack = new Stack(entry.length());
-				
-				for(int i = 0; i < entry.length(); i++) {
+				// Builds new stack that will be used to contain the results
+				Stack newStack = new Stack(length);
+	
+				// Iterates through the first stack and pops out the elements, pushes them if they're numbers and calculates if it's an operator
+				for(int i = 0; i < length; i++) {
 					
-					if(entry.charAt(i) > 47 && entry.charAt(i) < 58) {
-						newStack.push(entry.charAt(i));
+					String currentEntry = calcStack.pop();
+					
+					if(opValue(currentEntry) < 1) {
+						if(Integer.parseInt(currentEntry) > -1) {
+							newStack.push(currentEntry);
+						}
 					}
-					else {
-						int firstOp = newStack.pop() - 48;
-						int secondOp = newStack.pop() - 48;
-						int res = calc(firstOp, secondOp, entry.charAt(i));
-						String stringResult = res + "";
-						b1.append(stringResult);
-						//newStack.push(res);
-						System.out.println(firstOp);
-						System.out.println(secondOp);
-						System.out.println(entry.charAt(i));
-					}
+					else if(opValue(currentEntry) > 0 && newStack.isEmpty() != true) {
+						int secondVal = Integer.parseInt(newStack.pop());
+						int firstVal = Integer.parseInt(newStack.pop());
+						int res = calc(firstVal, secondVal, currentEntry);
+						String result = res + "";
+						newStack.push(result);
+					}				
 				}
 				
-				output = b1.toString();
+				// Fills output string with the resulting calculation in the stack once all operations have been completed
+				output = newStack.pop();
 				
-								
-			}
-				
-			
-			// 
+			// Displays whether or not the entry was valid
 			reader.display('\n' + "The expression entered was " + valid + '\n');
 			
 			// Displays results if the expression entered was valid
 			if(valid == "valid") {
 				reader.display('\n' + "The infix expression entered was: " + entry);
 				reader.display('\n' + "The converted postfix expression is: " + output + '\n');
+				}
 			}
 		}
 	}
 	
-	private int calc(int a, int b, char c) {
+	/**
+	 * Method used to perform operations on two integers. Converts the operator from string to char and then calculates.
+	 * 
+	 * @param a is the first operand
+	 * @param b is the second operand
+	 * @param s is the operator in string format
+	 * @return the result of the calculation or -1 if an invalid operator was passed
+	 */
+	private int calc(int a, int b, String s) {
+		char c = s.charAt(0);
 		int result = 0;
 		if(c == '+') {
 			result = a + b;
@@ -132,15 +140,27 @@ public class CalculatorApp {
 		return result;
 	}
 	
-	private int opValue(char op) {
-		int val = 0;
-		if(op == '+' || op == '-') {
-			val = 1;
+	/**
+	 * Method used to determine the precedence of the operator. In this program, it is simply used to check if a character is an operator.
+	 * 
+	 * @param s is the operator in string format
+	 * @return the precedence value of the operator
+	 */
+	private int opValue(String s) {
+		if(s.length() > 1) {
+			return 0;
 		}
-		else if(op == '*' || op == '/') {
-			val = 2;
+		else {
+			char op = s.charAt(0);
+			int val = 0;
+			if(op == '+' || op == '-') {
+				val = 1;
+			}
+			else if(op == '*' || op == '/') {
+				val = 2;
+			}
+			return val;
 		}
-		return val;
 	}
 	
 	public static void main(String[] args) {

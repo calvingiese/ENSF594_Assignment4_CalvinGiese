@@ -1,15 +1,15 @@
 /**
  * Class Name: Stack
  * 
- * Used to build a stack of characters and allows adding or removing from the stack as well as checking if it's empty/full.
+ * Used to build a stack of strings and allows adding or removing from the stack as well as checking if it's empty/full.
  * 
  * The main purpose of this class is to build a stack in the form of an array with the size that is passed to the class. 
- * A character can be pushed to the top of the stack and the top letter of the stack can be popped out. The class also allows
+ * A string can be pushed to the top of the stack and the top string of the stack can be popped out. The class also allows
  * for checking if the stack is empty or full.
  * 
  * @author Calvin Giese
  * @version version 1.0
- * @since July 26, 2021
+ * @since July 27, 2021
  *
  */
 
@@ -23,7 +23,7 @@ public class Stack {
 	/**
 	 * The stack in array form that will be filled with characters
 	 */
-	private char[] stackValues;
+	private String[] stackValues;
 	
 	/**
 	 * The top value in the stack
@@ -38,26 +38,30 @@ public class Stack {
 	public Stack(int s) {
 		
 		maxSize = s;
-		stackValues = new char[maxSize];
+		stackValues = new String[maxSize];
 		top = -1;
 	}
 	
 	/**
-	 * Method used to add a character to the stack
+	 * Method used to add a string to the stack
 	 * 
-	 * @param j is the character to add
+	 * @param j is the string to add
 	 */
-	public void push(char j) {
+	public void push(String j) {
 		stackValues[++top] = j;
 	}
 	
 	/**
 	 * Method used to retrieve the top value in the stack
 	 * 
-	 * @return the top character
+	 * @return the top string
 	 */
-	public char pop() {
+	public String pop() {
 		return stackValues[top--];
+	}
+	
+	public String peek() {
+		return stackValues[top];
 	}
 	
 	/**
